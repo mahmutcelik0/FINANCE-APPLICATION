@@ -1,17 +1,21 @@
 package com.example.celik.backend.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.celik.backend.model.User;
+import com.example.celik.backend.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/register")
 public class RegisterController {
-    @GetMapping
-    private String getRegisterDetails(){
-        return "REGISTER DETAILS";
+    private final UserService userService;
+
+    public RegisterController(UserService userService) {
+        this.userService = userService;
     }
 
-
-
+    @PostMapping
+    public ResponseEntity addNewUser(@RequestBody User user){
+        return userService.addNewUser(user);
+    }
 }

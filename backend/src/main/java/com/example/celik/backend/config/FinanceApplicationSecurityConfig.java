@@ -45,10 +45,10 @@ public class FinanceApplicationSecurityConfig {
                 });
             })
 
-            .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact", "/register").csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) // ??
+            .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact", "/register","/role").csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) // bu pattern ları eklemeyince post put delete vs izin vermiyor
 
             .authorizeHttpRequests(request ->request
-                .requestMatchers("/dashboard").authenticated()
+                .requestMatchers("/dashboard","/role","/user").authenticated()
                 .requestMatchers("/register","/home").permitAll())
 
 
