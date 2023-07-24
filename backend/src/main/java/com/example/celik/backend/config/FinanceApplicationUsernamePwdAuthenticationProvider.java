@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Component()
 public class FinanceApplicationUsernamePwdAuthenticationProvider implements AuthenticationProvider {
     private UserService userService;
     private PasswordEncoder passwordEncoder;
@@ -39,7 +39,7 @@ public class FinanceApplicationUsernamePwdAuthenticationProvider implements Auth
             List<GrantedAuthority> roles = new ArrayList<>();
             user.getRoles().forEach(e-> roles.add(new SimpleGrantedAuthority(e.getRoleName())));
 
-            return new UsernamePasswordAuthenticationToken(authentication.getName(),authentication.getCredentials().toString(),roles);
+            return new UsernamePasswordAuthenticationToken(user,authentication.getCredentials().toString(),roles);
         } catch (EmailNotFoundException e) {
             throw new AuthenticationException(e.getMessage()) {
                 @Override

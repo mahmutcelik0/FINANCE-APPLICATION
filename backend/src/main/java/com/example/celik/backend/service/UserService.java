@@ -6,8 +6,11 @@ import com.example.celik.backend.model.User;
 import com.example.celik.backend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -22,13 +25,13 @@ public class UserService {
     }
 
     public User findUserByEmail(String email) throws EmailNotFoundException {
-        User user = userRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(email);
 
-        if (user == null) {
+        if (user.isEmpty()) {
             throw new EmailNotFoundException("EMAIL NOT FOUND - BAD CREDENTIALS");
         }
 
-        return user;
+        return user.get();
     }
 
     public ResponseEntity addNewUser(User user) {
@@ -46,8 +49,13 @@ public class UserService {
         if(!isExist(email)){
             throw new EmailNotFoundException("Bad credentials");
         }
-        User user = userRepository.findByEmail(email);
-        return UserDto.perform(user);
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if(user.isEmpty()){
+            throw new UsernameNotFoundException("Username is not correct");
+        }
+
+        return UserDto.perform(user.get());
     }
 
     public boolean isExist(String email){

@@ -3,14 +3,15 @@ package com.example.celik.backend.config;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -22,11 +23,9 @@ public class FinanceApplicationSecurityConfig {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        requestHandler.setCsrfRequestAttributeName("_csrf");
 
         http
-            //.sessionManagement(e -> e.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT TOKEN ICIN STATELESS OLMASINI SAGLAR
+            .sessionManagement(e -> e.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT TOKEN ICIN STATELESS OLMASINI SAGLAR
 
             .cors(cors -> {
                 cors.configurationSource(new CorsConfigurationSource() {
@@ -45,16 +44,16 @@ public class FinanceApplicationSecurityConfig {
                 });
             })
 
-            .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact", "/register","/role","/wealth").csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) // bu pattern ları eklemeyince post put delete vs izin vermiyor
+//            .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact", "/register","/role","/wealth").csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) // bu pattern ları eklemeyince post put delete vs izin vermiyor
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(request ->request
+                    .requestMatchers("/dashboard","/role","/user","/wealth").authenticated()
+                    .requestMatchers("/register","/home","/auth/**").permitAll())
 
-            .authorizeHttpRequests(request ->request
-                .requestMatchers("/dashboard","/role","/user","/wealth").authenticated()
-                .requestMatchers("/register","/home").permitAll())
 
+                .httpBasic(Customizer.withDefaults())
 
-            .httpBasic(Customizer.withDefaults())
-
-            .formLogin(Customizer.withDefaults());
+                .formLogin(Customizer.withDefaults());
 
             return http.build();
     }
@@ -64,4 +63,5 @@ public class FinanceApplicationSecurityConfig {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
 }
