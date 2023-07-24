@@ -45,10 +45,10 @@ public class FinanceApplicationSecurityConfig {
                 });
             })
 
-            .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact", "/register","/role").csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) // bu pattern ları eklemeyince post put delete vs izin vermiyor
+            .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact", "/register","/role","/wealth").csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) // bu pattern ları eklemeyince post put delete vs izin vermiyor
 
             .authorizeHttpRequests(request ->request
-                .requestMatchers("/dashboard","/role","/user").authenticated()
+                .requestMatchers("/dashboard","/role","/user","/wealth").authenticated()
                 .requestMatchers("/register","/home").permitAll())
 
 

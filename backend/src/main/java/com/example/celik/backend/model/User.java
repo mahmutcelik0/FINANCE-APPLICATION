@@ -41,6 +41,11 @@ public class User {
     private Set<Role> roles;
 
 
-
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "wealth_id")
+    )
+    private Set<Wealth> wealths;
 
 }
