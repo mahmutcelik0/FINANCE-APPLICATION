@@ -1,5 +1,7 @@
 package com.example.celik.backend.config;
 
+import com.example.celik.backend.filter.JwtTokenFilter;
+import com.example.celik.backend.utils.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -20,6 +23,11 @@ import java.util.Collections;
 
 @Configuration
 public class FinanceApplicationSecurityConfig {
+    private final JwtTokenFilter jwtTokenFilter;
+
+    public FinanceApplicationSecurityConfig(JwtTokenFilter jwtTokenFilter) {
+        this.jwtTokenFilter = jwtTokenFilter;
+    }
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -47,13 +55,11 @@ public class FinanceApplicationSecurityConfig {
 //            .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact", "/register","/role","/wealth").csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) // bu pattern ları eklemeyince post put delete vs izin vermiyor
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->request
-                    .requestMatchers("/dashboard","/role","/user","/wealth").authenticated()
-                    .requestMatchers("/register","/home","/auth/**").permitAll())
+                        .requestMatchers("/dashboard","/role","/user","/wealth").authenticated()
+                        .requestMatchers("/register","/home","/auth/**").permitAll())
 
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
-                .httpBasic(Customizer.withDefaults())
-
-                .formLogin(Customizer.withDefaults());
 
             return http.build();
     }
